@@ -21,7 +21,9 @@ const userSchema = new Schema(
     },
     full_name: {
       type: String,
-      default: "",
+      min: 4,
+      max: 50,
+      required: true,
     },
     profile_image: {
       type: String,
@@ -35,7 +37,7 @@ const userSchema = new Schema(
     },
     date_of_birth: {
       type: Date,
-      default: Date.now(),
+      default: "",
     },
     gender: {
       type: String,

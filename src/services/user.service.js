@@ -7,4 +7,8 @@ const getByOptions = (options) => {
   return User.findOne(query);
 };
 
-export { getByOptions };
+const create = (data) => {
+  return User.create(data);
+};
+
+export { getByOptions, create };
