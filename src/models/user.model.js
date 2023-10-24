@@ -2,6 +2,9 @@ import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
   {
+    googleId: {
+      type: String,
+    },
     username: {
       type: String,
       min: 3,
@@ -37,7 +40,7 @@ const userSchema = new Schema(
     },
     date_of_birth: {
       type: Date,
-      default: "",
+      default: null,
     },
     gender: {
       type: String,
