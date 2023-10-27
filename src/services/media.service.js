@@ -1,5 +1,13 @@
 import Media from "../models/media.model.js";
 
+const getList = () => {
+  return Media.find();
+};
+
+const getById = (id) => {
+  return Media.findById(id);
+};
+
 const getByOptions = (options) => {
   const query = {
     [options.field]: options.payload,
@@ -7,8 +15,29 @@ const getByOptions = (options) => {
   return Media.findOne(query);
 };
 
-const create = (data) => {
-  return Media.create(data);
+const countDocuments = () => {
+  return Media.countDocuments();
 };
 
-export { getByOptions, create };
+const create = (media) => {
+  return Media.create(media);
+};
+
+const update = (media) => {
+  const { id, ...data } = media;
+  return Media.findByIdAndUpdate(id, data, { new: true });
+};
+
+const remove = (id) => {
+  return Media.findByIdAndDelete(id);
+};
+
+export {
+  getList,
+  getById,
+  getByOptions,
+  countDocuments,
+  create,
+  update,
+  remove,
+};

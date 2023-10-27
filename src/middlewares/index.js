@@ -1,1 +1,1 @@
-export * as userMiddleware from "./user.middleware.js";
+export * as authMiddleware from "./auth.middleware.js";

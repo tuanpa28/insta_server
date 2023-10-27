@@ -1,5 +1,22 @@
 import Post from "../models/post.model.js";
 
+const getList = (options) => {
+  return Post.paginate(
+    {},
+    {
+      ...options,
+      populate: [{ path: "user_id", select: "username email full_name" }],
+    }
+  );
+};
+
+const getById = (id) => {
+  return Post.findById(id).populate({
+    path: "user_id",
+    select: "username email full_name",
+  });
+};
+
 const getByOptions = (options) => {
   const query = {
     [options.field]: options.payload,
@@ -7,8 +24,29 @@ const getByOptions = (options) => {
   return Post.findOne(query);
 };
 
-const create = (data) => {
-  return Post.create(data);
+const countDocuments = () => {
+  return Post.countDocuments();
 };
 
-export { getByOptions, create };
+const create = (post) => {
+  return Post.create(post);
+};
+
+const update = (post) => {
+  const { id, ...data } = post;
+  return Post.findByIdAndUpdate(id, data, { new: true });
+};
+
+const remove = (id) => {
+  return Post.findByIdAndDelete(id);
+};
+
+export {
+  getList,
+  getById,
+  getByOptions,
+  countDocuments,
+  create,
+  update,
+  remove,
+};

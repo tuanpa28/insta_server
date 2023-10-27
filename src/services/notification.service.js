@@ -1,5 +1,13 @@
 import Notification from "../models/notification.model.js";
 
+const getList = () => {
+  return Notification.find();
+};
+
+const getById = (id) => {
+  return Notification.findById(id);
+};
+
 const getByOptions = (options) => {
   const query = {
     [options.field]: options.payload,
@@ -7,8 +15,29 @@ const getByOptions = (options) => {
   return Notification.findOne(query);
 };
 
-const create = (data) => {
-  return Notification.create(data);
+const countDocuments = () => {
+  return Notification.countDocuments();
 };
 
-export { getByOptions, create };
+const create = (notification) => {
+  return Notification.create(notification);
+};
+
+const update = (notification) => {
+  const { id, ...data } = notification;
+  return Notification.findByIdAndUpdate(id, data, { new: true });
+};
+
+const remove = (id) => {
+  return Notification.findByIdAndDelete(id);
+};
+
+export {
+  getList,
+  getById,
+  getByOptions,
+  countDocuments,
+  create,
+  update,
+  remove,
+};

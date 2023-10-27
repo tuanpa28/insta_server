@@ -1,32 +1,18 @@
 import express from "express";
-import { authController } from "../controllers/index.js";
-import passport from "passport";
+import { userController } from "../controllers/index.js";
 
 const routerUser = express.Router();
 
-// Login
-routerUser.post("/login", authController.login);
+// Get All
+routerUser.get("/", userController.getList);
 
-// Register
-routerUser.post("/register", authController.register);
+// Get By Id
+routerUser.get("/:id", userController.getById);
 
-// Login With Google;
-routerUser.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+// Update
+routerUser.patch("/:id", userController.update);
 
-// Xử lý kết quả sau khi người dùng đăng nhập bằng Google
-routerUser.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
-  }),
-  function (req, res) {
-    res.send(
-      '<script>window.opener.postMessage("success", "*"); window.close();</script>'
-    );
-  }
-);
+// Delete
+routerUser.delete("/:id", userController.remove);
 
 export default routerUser;

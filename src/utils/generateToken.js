@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-const generateToken = async (data) => {
+const generateToken = (data) => {
   const token = jwt.sign(data, process.env.SECRET_KEY, {
     expiresIn: "1d",
   });

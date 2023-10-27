@@ -37,7 +37,9 @@ const login = async (req, res) => {
       username: user.username,
       email: user.email,
     });
-    res.status(200).json(successfully({ accessToken }));
+    res
+      .status(200)
+      .json(successfully({ accessToken }, "Đăng nhập thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
