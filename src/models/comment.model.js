@@ -12,7 +12,7 @@ const commentSchema = new Schema(
       ref: "Post",
       required: true,
     },
-    comment_text: {
+    content: {
       type: String,
       max: 400,
       required: true,

@@ -9,6 +9,7 @@ const notificationSchema = new Schema(
     },
     type: {
       type: String,
+      enum: ["like", "comment", "follow", "share"],
       required: true,
     },
     source_id: {

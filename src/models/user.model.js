@@ -8,7 +8,7 @@ const userSchema = new Schema(
     },
     username: {
       type: String,
-      min: 3,
+      min: 4,
       max: 50,
       required: true,
       unique: true,
@@ -31,8 +31,7 @@ const userSchema = new Schema(
     },
     profile_image: {
       type: String,
-      min: 3,
-      max: 50,
+      default: "",
     },
     bio: {
       type: String,

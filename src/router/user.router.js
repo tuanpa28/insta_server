@@ -15,4 +15,10 @@ routerUser.patch("/:id", userController.update);
 // Delete
 routerUser.delete("/:id", userController.remove);
 
+// Follow User
+routerUser.put("/follow/:id", userController.followUser);
+
+// Get User Suggested
+routerUser.get("/suggested/followings", userController.getUserSuggested);
+
 export default routerUser;

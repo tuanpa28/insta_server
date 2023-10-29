@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const userSchema = Joi.object({
-  username: Joi.string().required().min(3).messages({
+  username: Joi.string().required().min(4).messages({
     "string.min": "username phải có ít nhất {#limit} ký tự!",
     "string.empty": "username không được để trống!",
     "any.required": "Trường username là bắt buộc!",

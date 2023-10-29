@@ -12,7 +12,21 @@ const postSchema = new Schema(
       type: String,
       max: 500,
     },
+    media: [
+      {
+        type: {
+          type: String,
+          enum: ["image", "video"],
+          required: true,
+        },
+        url: String,
+      },
+    ],
     likes: {
+      type: Array,
+      default: [],
+    },
+    shares: {
       type: Array,
       default: [],
     },

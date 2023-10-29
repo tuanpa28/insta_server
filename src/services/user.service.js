@@ -4,6 +4,13 @@ const getList = (options) => {
   return User.paginate({}, options);
 };
 
+const getListByOptions = (options) => {
+  const query = {
+    [options.field]: options.payload,
+  };
+  return User.paginate(query, options.options);
+};
+
 const getById = (id) => {
   return User.findById(id);
 };
@@ -34,6 +41,7 @@ const remove = (id) => {
 
 export {
   getList,
+  getListByOptions,
   getById,
   getByOptions,
   countDocuments,
