@@ -1,6 +1,7 @@
 import badRequest from "../formatResponse/badRequest.js";
 import serverError from "../formatResponse/serverError.js";
 import successfully from "../formatResponse/successfully.js";
+import User from "../models/user.model.js";
 import { userService } from "../services/index.js";
 import { userValidation } from "../validations/index.js";
 
@@ -97,7 +98,7 @@ const remove = async (req, res) => {
 const followUser = async (req, res) => {
   try {
     // const { _id: user_id } = req.user;
-    const user_id = "653b7a7b7bc959830d613d81";
+    const user_id = "653f1999f09df8dbcd8e0cc6";
 
     if (user_id !== req.params.id) {
       const user = await userService.getById(req.params.id);
@@ -158,4 +159,94 @@ const getUserSuggested = async (req, res) => {
   }
 };
 
-export { getList, getById, update, remove, followUser, getUserSuggested };
+const searchUser = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    // const users = await userService.getListByOptions({
+    //   field: "$text",
+    //   payload: {
+    //     $search: q,
+    //     $caseSensitive: false,
+    //     $diacriticSensitive: false,
+    //   },
+    //   options: {},
+    // });
+
+    const users = await User.find({
+      $text: {
+        $search: q,
+        $caseSensitive: false,
+        $diacriticSensitive: false,
+      },
+    });
+
+    // if (!users || users.length === 0) {
+    //   return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    // }
+
+    // const data = users.map((user) => ({
+    //   id: user._id,
+    //   profile_image: user.profile_image,
+    //   username: user.username,
+    //   email: user.email,
+    //   full_name: user.full_name,
+    // }));
+
+    res.status(200).json(successfully(users, "Lấy dữ liệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+const getFollowers = async (req, res) => {
+  try {
+    // const { _id: user_id } = req.user;
+    const user_id = "653f096f01e8ec2f49215c74";
+
+    const user = await User.findById(user_id).populate({
+      path: "followers",
+      select: "username email full_name profile_image bio current_city",
+    });
+
+    if (!user) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    res.status(200).json(successfully(user, "Lấy dữ liệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+const getFollowings = async (req, res) => {
+  try {
+    // const { _id: user_id } = req.user;
+    const user_id = "653f096f01e8ec2f49215c74";
+
+    const user = await User.findById(user_id).populate({
+      path: "followings",
+      select: "username email full_name profile_image bio current_city",
+    });
+
+    if (!user) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    res.status(200).json(successfully(user, "Lấy dữ liệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+export {
+  getList,
+  getById,
+  update,
+  remove,
+  followUser,
+  getUserSuggested,
+  searchUser,
+  getFollowers,
+  getFollowings,
+};

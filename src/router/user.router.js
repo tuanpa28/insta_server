@@ -19,6 +19,15 @@ routerUser.delete("/:id", userController.remove);
 routerUser.put("/follow/:id", userController.followUser);
 
 // Get User Suggested
-routerUser.get("/suggested/followings", userController.getUserSuggested);
+routerUser.get("/suggested/results", userController.getUserSuggested);
+
+// Search User
+routerUser.get("/search/results", userController.searchUser);
+
+// Get Followers
+routerUser.get("/followers/results", userController.getFollowers);
+
+// Get Followings
+routerUser.get("/followings/results", userController.getFollowings);
 
 export default routerUser;

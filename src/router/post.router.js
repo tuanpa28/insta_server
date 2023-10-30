@@ -18,4 +18,10 @@ routerPost.patch("/:id", postController.update);
 // Delete
 routerPost.delete("/:id", postController.remove);
 
+// Like / Unlike Post
+routerPost.put("/:id/like", postController.likePost);
+
+// Share Post
+routerPost.put("/:id/share", postController.sharePost);
+
 export default routerPost;

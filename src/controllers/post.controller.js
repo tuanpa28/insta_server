@@ -136,4 +136,48 @@ const remove = async (req, res) => {
   }
 };
 
-export { getList, getById, create, update, remove };
+const likePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // const { _id: user_id } = req.user;
+    const user_id = "653f096f01e8ec2f49215c74";
+
+    const post = await postService.getById(id);
+
+    if (!post) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    if (!post.likes.includes(user_id)) {
+      await post.updateOne({ $push: { likes: user_id } });
+      res.status(200).json("You have been like post!");
+    } else {
+      await post.updateOne({ $pull: { likes: user_id } });
+      res.status(200).json("The post has been unliked!!");
+    }
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+const sharePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // const { _id: user_id } = req.user;
+    const user_id = "653f096f01e8ec2f49215c74";
+
+    const post = await postService.getById(id);
+
+    if (!post) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    await post.updateOne({ $push: { shares: user_id } });
+
+    res.status(200).json("The post has been share!!");
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+export { getList, getById, create, update, remove, likePost, sharePost };

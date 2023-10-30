@@ -10,6 +10,12 @@ routerAuth.post("/login", authController.login);
 // Register
 routerAuth.post("/register", authController.register);
 
+// Refresh Token
+routerAuth.post("/refreshToken", authController.refreshToken);
+
+// Logout
+routerAuth.post("/logout", authController.Logout);
+
 // Login With Google;
 routerAuth.get(
   "/auth/google",

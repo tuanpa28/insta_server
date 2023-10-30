@@ -56,14 +56,18 @@ const userSchema = new Schema(
       max: 100,
       default: "",
     },
-    followers: {
-      type: Array,
-      default: [],
-    },
-    followings: {
-      type: Array,
-      default: [],
-    },
+    followers: [
+      {
+        type: mongoose.ObjectId,
+        ref: "User",
+      },
+    ],
+    followings: [
+      {
+        type: mongoose.ObjectId,
+        ref: "User",
+      },
+    ],
     isAdmin: {
       type: Boolean,
       default: false,
@@ -72,6 +76,7 @@ const userSchema = new Schema(
   { timestamps: true, versionKey: false }
 );
 
+userSchema.index({ username: "text", full_name: "text" });
 userSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("User", userSchema);
