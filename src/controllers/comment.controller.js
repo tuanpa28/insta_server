@@ -159,6 +159,70 @@ const likeComment = async (req, res) => {
   }
 };
 
+const createCommentReply = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reply_id, content } = req.body;
+    // const { _id: user_id } = req.user;
+    const user_id = "653f096f01e8ec2f49215c74";
+
+    const reply = {
+      _id: reply_id,
+      user_id,
+      content,
+    };
+
+    const comment = await commentService.getById(id);
+
+    if (!comment) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    await comment.updateOne({ $push: { replies: reply } });
+
+    res.status(200).json("Replied to the comment!!!");
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+const deleteCommentReply = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reply_id, idAdminPost } = req.body;
+    // const { _id: user_id } = req.user;
+    const user_id = "653b7a7b7bc959830d613d81";
+
+    const comment = await commentService.getById(id);
+    if (!comment) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    if (
+      user_id === idAdminPost ||
+      comment.replies.some((item) => item.user_id === user_id)
+    ) {
+      await comment.updateOne({
+        $pull: { replies: { _id: reply_id } },
+      });
+      res.status(200).json("The reply has been deleted!!");
+    } else {
+      res
+        .status(403)
+        .json(badRequest(403, "You can delete only your reply!!!"));
+    }
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+const getAllReplyForOneComment = async (req, res) => {
+  try {
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
 export {
   getList,
   getById,
@@ -167,4 +231,7 @@ export {
   remove,
   getAllCommentForOnePost,
   likeComment,
+  createCommentReply,
+  deleteCommentReply,
+  getAllReplyForOneComment,
 };

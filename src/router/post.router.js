@@ -13,7 +13,7 @@ routerPost.get("/:id", postController.getById);
 routerPost.post("/", postController.create);
 
 // Update
-routerPost.patch("/:id", postController.update);
+routerPost.put("/:id", postController.update);
 
 // Delete
 routerPost.delete("/:id", postController.remove);
@@ -29,5 +29,8 @@ routerPost.get("/timeline/results", postController.postsOnTimeline);
 
 // Get All Post For One User
 routerPost.get("/user/results", postController.getAllPostForOneUser);
+
+// Get All Media Posts User
+routerPost.get("/medias/results", postController.getAllMediaPostsUser);
 
 export default routerPost;

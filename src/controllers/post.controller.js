@@ -234,7 +234,7 @@ const getAllPostForOneUser = async (req, res) => {
     // const { _id: user_id } = req.user;
     const user_id = "653f15cb48d456747341bb8e";
 
-    const data = await postService.getListByOptions({
+    const { docs: posts } = await postService.getListByOptions({
       field: "user_id",
       payload: user_id,
       options: {
@@ -242,13 +242,41 @@ const getAllPostForOneUser = async (req, res) => {
       },
     });
 
-    const posts = data.docs;
-
     if (!posts || posts.length === 0) {
       return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
     }
 
     res.status(200).json(successfully(posts, "Lấy dữ liệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+const getAllMediaPostsUser = async (req, res) => {
+  try {
+    // const { _id: user_id } = req.user;
+    const user_id = "653f15cb48d456747341bb8e";
+
+    const { docs: posts } = await postService.getListByOptions({
+      field: "user_id",
+      payload: user_id,
+      options: {},
+    });
+
+    if (!posts || posts.length === 0) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    const newMedia = [];
+    posts.map((post) => {
+      const data = post?.media.map(({ type, url }) => {
+        return { post_id: post._id, type, url };
+      });
+
+      newMedia.push(...data);
+    });
+
+    res.status(200).json(successfully(newMedia, "Lấy dữ liệu thành công!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -264,4 +292,5 @@ export {
   sharePost,
   postsOnTimeline,
   getAllPostForOneUser,
+  getAllMediaPostsUser,
 };

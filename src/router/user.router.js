@@ -10,7 +10,7 @@ routerUser.get("/", userController.getList);
 routerUser.get("/:id", userController.getById);
 
 // Update
-routerUser.patch("/:id", userController.update);
+routerUser.put("/:id", userController.update);
 
 // Delete
 routerUser.delete("/:id", userController.remove);

@@ -13,7 +13,7 @@ routerComment.get("/:id", commentController.getById);
 routerComment.post("/", commentController.create);
 
 // Update
-routerComment.patch("/:id", commentController.update);
+routerComment.put("/:id", commentController.update);
 
 // Delete
 routerComment.delete("/:id", commentController.remove);
@@ -23,5 +23,17 @@ routerComment.get("/:id/post", commentController.getAllCommentForOnePost);
 
 // Like / Unlike Comment
 routerComment.put("/:id/like", commentController.likeComment);
+
+// Create Comment Reply
+routerComment.post("/reply/:id", commentController.createCommentReply);
+
+// Delete Comment Reply
+routerComment.delete("/reply/:id", commentController.deleteCommentReply);
+
+// Get All Reply For One Comment
+routerComment.get(
+  "/reply/:id/results",
+  commentController.getAllReplyForOneComment
+);
 
 export default routerComment;

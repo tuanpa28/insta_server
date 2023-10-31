@@ -13,7 +13,7 @@ routerNotification.get("/:id", notificationController.getById);
 routerNotification.post("/", notificationController.create);
 
 // Update
-routerNotification.patch("/:id", notificationController.update);
+routerNotification.put("/:id", notificationController.update);
 
 // Delete
 routerNotification.delete("/:id", notificationController.remove);
