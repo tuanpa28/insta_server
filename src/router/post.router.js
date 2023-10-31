@@ -24,4 +24,10 @@ routerPost.put("/:id/like", postController.likePost);
 // Share Post
 routerPost.put("/:id/share", postController.sharePost);
 
+// Posts On Timeline
+routerPost.get("/timeline/results", postController.postsOnTimeline);
+
+// Get All Post For One User
+routerPost.get("/user/results", postController.getAllPostForOneUser);
+
 export default routerPost;

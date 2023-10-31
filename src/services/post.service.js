@@ -10,6 +10,13 @@ const getList = (options) => {
   );
 };
 
+const getListByOptions = (options) => {
+  const query = {
+    [options.field]: options.payload,
+  };
+  return Post.paginate(query, options.options);
+};
+
 const getById = (id) => {
   return Post.findById(id).populate({
     path: "user_id",
@@ -43,6 +50,7 @@ const remove = (id) => {
 
 export {
   getList,
+  getListByOptions,
   getById,
   getByOptions,
   countDocuments,

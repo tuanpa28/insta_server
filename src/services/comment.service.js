@@ -7,6 +7,13 @@ const getList = () => {
   });
 };
 
+const getListByOptions = (options) => {
+  const query = {
+    [options.field]: options.payload,
+  };
+  return Comment.find(query);
+};
+
 const getById = (id) => {
   return Comment.findById(id);
 };
@@ -43,4 +50,5 @@ export {
   create,
   update,
   remove,
+  getListByOptions,
 };

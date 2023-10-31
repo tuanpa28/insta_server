@@ -1,7 +1,7 @@
 import badRequest from "../formatResponse/badRequest.js";
 import serverError from "../formatResponse/serverError.js";
 import successfully from "../formatResponse/successfully.js";
-import { postService } from "../services/index.js";
+import { postService, userService } from "../services/index.js";
 import { postValidation } from "../validations/index.js";
 
 const getList = async (req, res) => {
@@ -56,7 +56,7 @@ const getById = async (req, res) => {
 const create = async (req, res) => {
   try {
     // const { _id: user_id } = req.user;
-    const user_id = "653b7a7b7bc959830d613d81";
+    const user_id = "653f15cb48d456747341bb8e";
 
     const { error } = postValidation.default.validate(
       {
@@ -180,4 +180,88 @@ const sharePost = async (req, res) => {
   }
 };
 
-export { getList, getById, create, update, remove, likePost, sharePost };
+const postsOnTimeline = async (req, res) => {
+  try {
+    // const { _id: user_id } = req.user;
+    const user_id = "653f096f01e8ec2f49215c74";
+
+    const {
+      page = 1,
+      limit = 10,
+      _sort = "createdAt",
+      _order = "asc",
+      ...params
+    } = req.query;
+
+    const options = {
+      page,
+      limit,
+      sort: {
+        [_sort]: _order === "desc" ? -1 : 1,
+      },
+      ...params,
+      customLabels: {
+        docs: "data",
+      },
+    };
+
+    const user = await userService.getById(user_id);
+
+    if (!user) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    let friendPosts;
+    for (const friendId of user.followings) {
+      friendPosts = await postService.getListByOptions({
+        field: "user_id",
+        payload: friendId,
+        options: {
+          ...options,
+          populate: [{ path: "user_id", select: "username email full_name" }],
+        },
+      });
+    }
+
+    res.status(200).json(successfully(friendPosts, "Lấy dữ liệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+const getAllPostForOneUser = async (req, res) => {
+  try {
+    // const { _id: user_id } = req.user;
+    const user_id = "653f15cb48d456747341bb8e";
+
+    const data = await postService.getListByOptions({
+      field: "user_id",
+      payload: user_id,
+      options: {
+        populate: [{ path: "user_id", select: "username email full_name" }],
+      },
+    });
+
+    const posts = data.docs;
+
+    if (!posts || posts.length === 0) {
+      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
+    }
+
+    res.status(200).json(successfully(posts, "Lấy dữ liệu thành công!"));
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
+};
+
+export {
+  getList,
+  getById,
+  create,
+  update,
+  remove,
+  likePost,
+  sharePost,
+  postsOnTimeline,
+  getAllPostForOneUser,
+};
