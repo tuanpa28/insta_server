@@ -161,37 +161,27 @@ const getUserSuggested = async (req, res) => {
 
 const searchUser = async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, page = 1, limit = 10, ...params } = req.query;
 
-    // const users = await userService.getListByOptions({
-    //   field: "$text",
-    //   payload: {
-    //     $search: q,
-    //     $caseSensitive: false,
-    //     $diacriticSensitive: false,
-    //   },
-    //   options: {},
-    // });
+    const options = {
+      select: "username email full_name profile_image",
+      page,
+      limit,
+      ...params,
+      customLabels: {
+        docs: "data",
+      },
+    };
 
-    const users = await User.find({
-      $text: {
+    const users = await userService.getListByOptions({
+      field: "$text",
+      payload: {
         $search: q,
         $caseSensitive: false,
         $diacriticSensitive: false,
       },
+      options,
     });
-
-    // if (!users || users.length === 0) {
-    //   return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
-    // }
-
-    // const data = users.map((user) => ({
-    //   id: user._id,
-    //   profile_image: user.profile_image,
-    //   username: user.username,
-    //   email: user.email,
-    //   full_name: user.full_name,
-    // }));
 
     res.status(200).json(successfully(users, "Lấy dữ liệu thành công!"));
   } catch (error) {

@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import generateRandomPassword from "../utils/generateRandomPassword.js";
+import randomstring from "randomstring";
 
 const configurePassport = () => {
   passport.serializeUser(function (user, done) {
@@ -31,9 +31,12 @@ const configurePassport = () => {
           if (user) {
             return cb(null, user);
           } else {
-            const randomPassword = generateRandomPassword();
+            const password = randomstring.generate({
+              length: 6,
+              charset: "numeric",
+            });
 
-            const hashedPassword = await bcrypt.hash(randomPassword, 10);
+            const hashedPassword = await bcrypt.hash(password, 10);
             // Người dùng không tồn tại, tạo người dùng mới
             const newUser = new User({
               googleId: profile.id,
