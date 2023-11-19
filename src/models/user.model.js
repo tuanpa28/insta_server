@@ -68,6 +68,10 @@ const userSchema = new Schema(
         ref: "User",
       },
     ],
+    tick: {
+      type: Boolean,
+      default: false,
+    },
     isAdmin: {
       type: Boolean,
       default: false,

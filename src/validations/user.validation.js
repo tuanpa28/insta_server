@@ -29,6 +29,7 @@ const userSchema = Joi.object({
   from: Joi.string(),
   followers: Joi.array(),
   followings: Joi.array(),
+  tick: Joi.boolean(),
   isAdmin: Joi.boolean(),
 });
 
