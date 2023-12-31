@@ -1,6 +1,7 @@
 import express from "express";
 import { authController } from "../controllers/index.js";
 import passport from "passport";
+import "dotenv/config";
 
 const routerAuth = express.Router();
 
@@ -26,7 +27,7 @@ routerAuth.get(
 routerAuth.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "http://localhost:3000/login",
+    failureRedirect: `${process.env.URL_CLIENT}/login`,
   }),
   authController.loginWithGoogle
 );

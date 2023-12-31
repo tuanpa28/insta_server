@@ -3,6 +3,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import randomstring from "randomstring";
+import "dotenv/config";
 
 const configurePassport = () => {
   // serializeUser: Lưu thông tin user.id vào session
@@ -25,7 +26,7 @@ const configurePassport = () => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:8080/api/auth/google/callback",
+        callbackURL: `${process.env.URL_CLIENT}/auth/google/callback`,
       },
       async function (accessToken, refreshToken, profile, cb) {
         try {

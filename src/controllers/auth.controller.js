@@ -6,7 +6,7 @@ import { userService } from "../services/index.js";
 import { authValidation } from "../validations/index.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import "dotenv/config.js";
+import "dotenv/config";
 
 const login = async (req, res) => {
   try {
@@ -57,7 +57,7 @@ const login = async (req, res) => {
       .cookie("refreshToken", refreshToken, {
         path: "/",
         httpOnly: true,
-        secure: false, // if https set secure = true
+        secure: true, // if https set secure = true
         sameSite: "Strict",
         maxAge: 60 * 60 * 24,
       })
@@ -143,7 +143,7 @@ const refreshToken = async (req, res) => {
         .cookie("refreshToken", newRefreshToken, {
           path: "/",
           httpOnly: true,
-          secure: false, // if https set secure = true
+          secure: true, // if https set secure = true
           sameSite: "Strict",
           maxAge: 60 * 60 * 24,
         })
@@ -180,7 +180,7 @@ const loginWithGoogle = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       path: "/",
       httpOnly: true,
-      secure: false, // if https set secure = true
+      secure: true, // if https set secure = true
       sameSite: "Strict",
       maxAge: 60 * 60 * 24,
     });
