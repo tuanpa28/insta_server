@@ -8,6 +8,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const login = async (req, res) => {
   try {
     const { error } = authValidation.default.validate(req.body);
@@ -57,7 +59,7 @@ const login = async (req, res) => {
       .cookie("refreshToken", refreshToken, {
         path: "/",
         httpOnly: true,
-        secure: true, // if https set secure = true
+        secure: isProduction, // if https set secure = true
         sameSite: "Strict",
         maxAge: 60 * 60 * 24,
       })
@@ -143,7 +145,7 @@ const refreshToken = async (req, res) => {
         .cookie("refreshToken", newRefreshToken, {
           path: "/",
           httpOnly: true,
-          secure: true, // if https set secure = true
+          secure: isProduction, // if https set secure = true
           sameSite: "Strict",
           maxAge: 60 * 60 * 24,
         })
@@ -180,7 +182,7 @@ const loginWithGoogle = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       path: "/",
       httpOnly: true,
-      secure: true, // if https set secure = true
+      secure: isProduction, // if https set secure = true
       sameSite: "Strict",
       maxAge: 60 * 60 * 24,
     });
