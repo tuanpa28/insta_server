@@ -24,7 +24,7 @@ try {
 }
 
 // middleware
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 // Sử dụng cookie-parser để xử lý cookie
 app.use(cookieParser());
 // Sử dụng express-session cho việc quản lý phiên (session)

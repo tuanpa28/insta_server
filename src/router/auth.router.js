@@ -14,7 +14,7 @@ routerAuth.post("/register", authController.register);
 routerAuth.post("/refreshToken", authController.refreshToken);
 
 // Logout
-routerAuth.post("/logout", authController.Logout);
+routerAuth.delete("/logout", authController.logout);
 
 // Login With Google;
 routerAuth.get(
@@ -28,11 +28,7 @@ routerAuth.get(
   passport.authenticate("google", {
     failureRedirect: "http://localhost:3000/login",
   }),
-  function (req, res) {
-    res.send(
-      '<script>window.opener.postMessage("success", "*"); window.close();</script>'
-    );
-  }
+  authController.loginWithGoogle
 );
 
 export default routerAuth;

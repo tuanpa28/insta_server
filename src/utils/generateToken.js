@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-const generateToken = (data) => {
+const generateToken = (data, expiresIn = "10m") => {
   const token = jwt.sign(data, process.env.SECRET_KEY, {
-    expiresIn: "1d",
+    expiresIn,
   });
   return token;
 };

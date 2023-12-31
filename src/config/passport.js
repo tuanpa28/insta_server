@@ -5,10 +5,12 @@ import bcrypt from "bcryptjs";
 import randomstring from "randomstring";
 
 const configurePassport = () => {
+  // serializeUser: Lưu thông tin user.id vào session
   passport.serializeUser(function (user, done) {
     done(null, user.id);
   });
 
+  // deserializeUser: Lấy thông tin user từ id trong session
   passport.deserializeUser(async function (id, done) {
     try {
       const user = await User.findById(id);
@@ -27,7 +29,9 @@ const configurePassport = () => {
       },
       async function (accessToken, refreshToken, profile, cb) {
         try {
-          let user = await User.findOne({ googleId: profile.id });
+          let user = await User.findOne({
+            $or: [{ googleId: profile.id }, { email: profile.emails[0].value }],
+          });
           if (user) {
             return cb(null, user);
           } else {
@@ -48,6 +52,7 @@ const configurePassport = () => {
             });
 
             user = await newUser.save();
+
             return cb(null, user);
           }
         } catch (error) {

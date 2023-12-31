@@ -2,6 +2,7 @@ import badRequest from "../formatResponse/badRequest.js";
 import serverError from "../formatResponse/serverError.js";
 import successfully from "../formatResponse/successfully.js";
 import { postService, userService } from "../services/index.js";
+import formatTimeDifference from "../utils/formatTimeDifference.js";
 import { postValidation } from "../validations/index.js";
 
 const getList = async (req, res) => {
@@ -55,8 +56,7 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f15cb48d456747341bb8e";
+    const { _id: user_id } = req.user;
 
     const { error } = postValidation.default.validate(
       {
@@ -90,8 +90,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    // const { _id: user_id } = req.user;
-    const user_id = "653b7a7b7bc959830d613d81";
+    const { _id: user_id } = req.user;
 
     const { error } = postValidation.default.validate(
       {
@@ -139,8 +138,7 @@ const remove = async (req, res) => {
 const likePost = async (req, res) => {
   try {
     const { id } = req.params;
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const post = await postService.getById(id);
 
@@ -163,8 +161,7 @@ const likePost = async (req, res) => {
 const sharePost = async (req, res) => {
   try {
     const { id } = req.params;
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const post = await postService.getById(id);
 
@@ -182,8 +179,7 @@ const sharePost = async (req, res) => {
 
 const postsOnTimeline = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const {
       page = 1,
@@ -207,23 +203,47 @@ const postsOnTimeline = async (req, res) => {
 
     const user = await userService.getById(user_id);
 
-    if (!user) {
-      return res.status(404).json(badRequest(404, "Không có dữ liệu!"));
-    }
+    user.followings.splice(0, 0, user._id);
 
-    let friendPosts;
+    const friendPosts = [];
     for (const friendId of user.followings) {
-      friendPosts = await postService.getListByOptions({
+      const { data } = await postService.getListByOptions({
         field: "user_id",
         payload: friendId,
         options: {
           ...options,
-          populate: [{ path: "user_id", select: "username email full_name" }],
+          populate: [
+            {
+              path: "user_id",
+              select:
+                "username profile_image full_name followers followings createdAt",
+            },
+          ],
         },
       });
+
+      friendPosts.push(...data);
     }
 
-    res.status(200).json(successfully(friendPosts, "Lấy dữ liệu thành công!"));
+    friendPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const newFriendPosts = [];
+
+    friendPosts.map((post) => {
+      const createAtDate = new Date(post.createdAt);
+      const now = new Date();
+
+      const timeDifference = now.getTime() - createAtDate.getTime();
+
+      newFriendPosts.push({
+        ...post._doc,
+        createdAt: formatTimeDifference(timeDifference),
+      });
+    });
+
+    res
+      .status(200)
+      .json(successfully(newFriendPosts, "Lấy dữ liệu thành công!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
@@ -231,8 +251,7 @@ const postsOnTimeline = async (req, res) => {
 
 const getAllPostForOneUser = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f15cb48d456747341bb8e";
+    const { _id: user_id } = req.user;
 
     const { docs: posts } = await postService.getListByOptions({
       field: "user_id",
@@ -254,8 +273,7 @@ const getAllPostForOneUser = async (req, res) => {
 
 const getAllMediaPostsUser = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f15cb48d456747341bb8e";
+    const { _id: user_id } = req.user;
 
     const { docs: posts } = await postService.getListByOptions({
       field: "user_id",

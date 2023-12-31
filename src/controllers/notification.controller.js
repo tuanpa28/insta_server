@@ -37,8 +37,7 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653b7a7b7bc959830d613d81";
+    const { _id: user_id } = req.user;
 
     const { error } = notificationValidation.default.validate(
       {
@@ -74,8 +73,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    // const { _id: user_id } = req.user;
-    const user_id = "653b7a7b7bc959830d613d81";
+    const { _id: user_id } = req.user;
 
     const { error } = notificationValidation.default.validate(
       {

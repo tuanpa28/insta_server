@@ -35,8 +35,7 @@ const getById = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const { error } = commentValidation.default.validate(
       {
@@ -70,8 +69,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    // const { _id: user_id } = req.user;
-    const user_id = "6537e3c967f4a1938f59a5a1";
+    const { _id: user_id } = req.user;
 
     const { error } = commentValidation.default.validate(
       {
@@ -138,8 +136,7 @@ const getAllCommentForOnePost = async (req, res) => {
 const likeComment = async (req, res) => {
   try {
     const { id } = req.params;
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const comment = await commentService.getById(id);
 
@@ -163,8 +160,7 @@ const createCommentReply = async (req, res) => {
   try {
     const { id } = req.params;
     const { reply_id, content } = req.body;
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const reply = {
       _id: reply_id,
@@ -190,8 +186,7 @@ const deleteCommentReply = async (req, res) => {
   try {
     const { id } = req.params;
     const { reply_id, idAdminPost } = req.body;
-    // const { _id: user_id } = req.user;
-    const user_id = "653b7a7b7bc959830d613d81";
+    const { _id: user_id } = req.user;
 
     const comment = await commentService.getById(id);
     if (!comment) {
@@ -208,8 +203,8 @@ const deleteCommentReply = async (req, res) => {
       res.status(200).json("The reply has been deleted!!");
     } else {
       res
-        .status(403)
-        .json(badRequest(403, "You can delete only your reply!!!"));
+        .status(400)
+        .json(badRequest(400, "You can delete only your reply!!!"));
     }
   } catch (error) {
     res.status(500).json(serverError(error.message));

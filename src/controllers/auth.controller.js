@@ -3,46 +3,64 @@ import serverError from "../formatResponse/serverError.js";
 import successfully from "../formatResponse/successfully.js";
 import generateToken from "../utils/generateToken.js";
 import { userService } from "../services/index.js";
-import { userValidation } from "../validations/index.js";
+import { authValidation } from "../validations/index.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config.js";
 
 const login = async (req, res) => {
   try {
-    const { error } = userValidation.default.validate(req.body);
+    const { error } = authValidation.default.validate(req.body);
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
 
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
-    // check if email exists
+    // check if email or username exists
     const user = await userService.getByOptions({
-      field: "email",
-      payload: email,
+      field: "$or",
+      payload: [{ email }, { username }],
     });
     if (!user) {
-      return res
-        .status(400)
-        .json(badRequest(400, "Tài khoản không tồn tại!!!"));
+      return res.status(400).json(badRequest(400, "Tài khoản không tồn tại!"));
     }
 
     // Check if password is correct
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json(badRequest(400, "Mật khẩu không hợp lệ!!!"));
+      return res.status(400).json(badRequest(400, "Mật khẩu không hợp lệ!"));
     }
 
-    const accessToken = generateToken({
-      id: user._id,
-      username: user.username,
-      email: user.email,
-    });
+    const accessToken = generateToken(
+      {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        full_name: user.full_name,
+        profile_image: user.profile_image,
+        bio: user.bio,
+        date_of_birth: user.date_of_birth,
+        gender: user.gender,
+        current_city: user.current_city,
+        from: user.from,
+        tick: user.tick,
+        isAdmin: user.isAdmin,
+      },
+      "10m"
+    );
+
+    const refreshToken = generateToken({ _id: user._id }, "1d");
 
     res
       .status(200)
+      .cookie("refreshToken", refreshToken, {
+        path: "/",
+        httpOnly: true,
+        secure: false, // if https set secure = true
+        sameSite: "Strict",
+        maxAge: 60 * 60 * 24,
+      })
       .json(successfully({ accessToken }, "Đăng nhập thành công !!!"));
   } catch (error) {
     res.status(500).json(serverError(error.message));
@@ -51,7 +69,7 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    const { error } = userValidation.default.validate(req.body);
+    const { error } = authValidation.default.validate(req.body);
     if (error) {
       return res.status(400).json(badRequest(400, error.details[0].message));
     }
@@ -64,7 +82,7 @@ const register = async (req, res) => {
     if (checkUserName) {
       return res
         .status(400)
-        .json(badRequest(400, "Tên người dùng đã tồn tại!!!"));
+        .json(badRequest(400, "Tên người dùng đã tồn tại!"));
     }
     // check email
     const checkEmail = await userService.getByOptions({
@@ -72,9 +90,7 @@ const register = async (req, res) => {
       payload: email,
     });
     if (checkEmail) {
-      return res
-        .status(400)
-        .json(badRequest(400, "Địa chỉ email đã tồn tại!!!"));
+      return res.status(400).json(badRequest(400, "Địa chỉ email đã tồn tại!"));
     }
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -95,36 +111,93 @@ const refreshToken = async (req, res) => {
     const { refreshToken } = req.cookies;
 
     if (!refreshToken)
-      return res.status(401).json(badRequest(401, "You`re not authenticate"));
+      return res.status(403).json(badRequest(403, "You`re not authenticate"));
 
     jwt.verify(refreshToken, process.env.SECRET_KEY, (error, user) => {
       if (error) {
-        return res.status(401).json(badRequest(401, "Token is not valid!"));
+        return res.status(403).json(badRequest(403, "Token is not valid!"));
       }
 
-      const newRefreshToken = generateToken({
-        id: user._id,
-        username: user.username,
-        email: user.email,
-      });
+      const accessToken = generateToken(
+        {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          full_name: user.full_name,
+          profile_image: user.profile_image,
+          bio: user.bio,
+          date_of_birth: user.date_of_birth,
+          gender: user.gender,
+          current_city: user.current_city,
+          from: user.from,
+          tick: user.tick,
+          isAdmin: user.isAdmin,
+        },
+        "10m"
+      );
 
-      res.cookie("refreshToken", newRefreshToken, {
-        httpOnly: true,
-        secure: false,
-        path: "/",
-        sameSite: "strict",
-      });
+      const newRefreshToken = generateToken({ _id: user._id }, "1d");
+
       return res
         .status(200)
-        .json(successfully({ user, refreshToken }, "Refresh token success!!!"));
+        .cookie("refreshToken", newRefreshToken, {
+          path: "/",
+          httpOnly: true,
+          secure: false, // if https set secure = true
+          sameSite: "Strict",
+          maxAge: 60 * 60 * 24,
+        })
+        .json(successfully({ accessToken }, "Refresh token success!!!"));
     });
   } catch (error) {
     res.status(500).json(serverError(error.message));
   }
 };
 
-const Logout = (req, res) => {
-  res.clearCookie("refreshToken");
+const loginWithGoogle = async (req, res) => {
+  const user = req.user;
+  try {
+    const accessToken = generateToken(
+      {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        full_name: user.full_name,
+        profile_image: user.profile_image,
+        bio: user.bio,
+        date_of_birth: user.date_of_birth,
+        gender: user.gender,
+        current_city: user.current_city,
+        from: user.from,
+        tick: user.tick,
+        isAdmin: user.isAdmin,
+      },
+      "10m"
+    );
+
+    const refreshToken = generateToken({ _id: user._id }, "1d");
+
+    res.cookie("refreshToken", refreshToken, {
+      path: "/",
+      httpOnly: true,
+      secure: false, // if https set secure = true
+      sameSite: "Strict",
+      maxAge: 60 * 60 * 24,
+    });
+
+    res.send(`
+      <script>
+        window.opener.postMessage({ type: "success", accessToken: "${accessToken}" }, "*");
+        window.close();
+      </script>
+    `);
+  } catch (error) {
+    res.status(500).json(serverError(error.message));
+  }
 };
 
-export { login, register, refreshToken, Logout };
+const logout = (req, res) => {
+  res.status(200).clearCookie("refreshToken").json("Logout successfully!");
+};
+
+export { login, register, refreshToken, loginWithGoogle, logout };

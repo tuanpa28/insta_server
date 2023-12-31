@@ -97,8 +97,7 @@ const remove = async (req, res) => {
 
 const followUser = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f1999f09df8dbcd8e0cc6";
+    const { _id: user_id } = req.user;
 
     if (user_id !== req.params.id) {
       const user = await userService.getById(req.params.id);
@@ -114,7 +113,7 @@ const followUser = async (req, res) => {
         res.status(200).json("User has been unfollowed!!");
       }
     } else {
-      return res.status(403).json(badRequest(403, "You cant follow youself!!"));
+      return res.status(400).json(badRequest(400, "You cant follow youself!!"));
     }
   } catch (error) {
     res.status(500).json(serverError(error.message));
@@ -123,8 +122,7 @@ const followUser = async (req, res) => {
 
 const getUserSuggested = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "6537e3c967f4a1938f59a5a1";
+    const { _id: user_id } = req.user;
 
     const { page = 1, limit = 8, ...params } = req.query;
 
@@ -151,6 +149,13 @@ const getUserSuggested = async (req, res) => {
       options,
     });
 
+    const results = suggestedUsers.data.filter(
+      (item) => item._id != user_id && userFollowings.indexOf(item._id) === -1
+    );
+
+    suggestedUsers.data = results;
+    suggestedUsers.totalDocs = results.length;
+
     res
       .status(200)
       .json(successfully(suggestedUsers, "Lấy dữ liệu thành công!"));
@@ -164,7 +169,7 @@ const searchUser = async (req, res) => {
     const { q, page = 1, limit = 10, ...params } = req.query;
 
     const options = {
-      select: "username email full_name profile_image",
+      select: "username email full_name profile_image tick",
       page,
       limit,
       ...params,
@@ -191,8 +196,7 @@ const searchUser = async (req, res) => {
 
 const getFollowers = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const user = await User.findById(user_id).populate({
       path: "followers",
@@ -211,8 +215,7 @@ const getFollowers = async (req, res) => {
 
 const getFollowings = async (req, res) => {
   try {
-    // const { _id: user_id } = req.user;
-    const user_id = "653f096f01e8ec2f49215c74";
+    const { _id: user_id } = req.user;
 
     const user = await User.findById(user_id).populate({
       path: "followings",

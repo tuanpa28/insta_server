@@ -1,38 +1,53 @@
 import express from "express";
 import { commentController } from "../controllers/index.js";
+import { authMiddleware } from "../middlewares/index.js";
 
+const { verifyToken, verifyAdmin } = authMiddleware;
 const routerComment = express.Router();
 
 // Get All
-routerComment.get("/", commentController.getList);
+routerComment.get("/", verifyToken, verifyAdmin, commentController.getList);
 
 // Get By Id
-routerComment.get("/:id", commentController.getById);
+routerComment.get("/:id", verifyToken, commentController.getById);
 
 // Create
-routerComment.post("/", commentController.create);
+routerComment.post("/", verifyToken, commentController.create);
 
 // Update
-routerComment.put("/:id", commentController.update);
+routerComment.put("/:id", verifyToken, commentController.update);
 
 // Delete
-routerComment.delete("/:id", commentController.remove);
+routerComment.delete("/:id", verifyToken, commentController.remove);
 
 // Get All Comment For One Post
-routerComment.get("/:id/post", commentController.getAllCommentForOnePost);
+routerComment.get(
+  "/:id/post",
+  verifyToken,
+  commentController.getAllCommentForOnePost
+);
 
 // Like / Unlike Comment
-routerComment.put("/:id/like", commentController.likeComment);
+routerComment.put("/:id/like", verifyToken, commentController.likeComment);
 
 // Create Comment Reply
-routerComment.post("/reply/:id", commentController.createCommentReply);
+routerComment.post(
+  "/reply/:id",
+  verifyToken,
+  commentController.createCommentReply
+);
 
 // Delete Comment Reply
-routerComment.delete("/reply/:id", commentController.deleteCommentReply);
+routerComment.delete(
+  "/reply/:id",
+  verifyToken,
+  commentController.deleteCommentReply
+);
 
 // Get All Reply For One Comment
 routerComment.get(
   "/reply/:id/results",
+  verifyToken,
   commentController.getAllReplyForOneComment
 );
 

@@ -2,9 +2,7 @@ import jwt from "jsonwebtoken";
 import badRequest from "../formatResponse/badRequest.js";
 
 const verifyToken = (req, res, next) => {
-  // Kiểm tra có thông tin token không
   if (req.headers.authorization) {
-    // Lấy mã token
     const accessToken = req.headers.authorization.split(" ")[1];
     jwt.verify(accessToken, process.env.SECRET_KEY, (error, user) => {
       if (error) {
@@ -18,19 +16,17 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-const authorization = async (req, res, next) => {
-  try {
-    const user = req.user;
-    // Kiểm tra xem user có phải admin hay không
+const verifyAdmin = async (req, res, next) => {
+  const user = req.user;
+
+  if (user) {
     if (!(user.isAdmin === true)) {
-      return res
-        .status(401)
-        .json(badRequest(401, "Bạn không có quyền thực hiện chức năng này!"));
+      return res.status(401).json(badRequest(401, "You're not authorization!"));
     }
     next();
-  } catch (error) {
-    res.status(403).json(badRequest(403, error.message));
+  } else {
+    res.status(401).json(badRequest(401, "You're not authenticated!"));
   }
 };
 
-export { verifyToken, authorization };
+export { verifyToken, verifyAdmin };
